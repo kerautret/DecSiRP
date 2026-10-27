@@ -1,13 +1,14 @@
 #!/bin/bash
 PATH=$PATH:/usr/bin/:/usr/local/bin:/opt/local/bin
 
-INPUT=$1
-LENGTH=$2
-THRESHOLDACC=$3
-THRESHOLDCONF=$4
-DISTANCEMAX=$5
-LAMBDA=$6
-RHO=$7
+INPUT_MESH=$1
+INPUT_IMAGE=$2
+LENGTH=$3
+THRESHOLDACC=$4
+THRESHOLDCONF=$5
+DISTANCEMAX=$6
+LAMBDA=$7
+RHO=$8
 
 function applyCommand
 {
@@ -29,7 +30,20 @@ echo "----------------------------------------"
 echo "-----Computing segmentation-------------"
 echo "----------------------------------------"
 
-COMMANDCompute="decSiRP -m  ${INPUT}  -l ${LENGTH} -a ${THRESHOLDACC} -c ${THRESHOLDCONF} -d ${DISTANCEMAX} --lambda ${LAMBDA} --rho ${RHO} --export-segmentation resultSeg.obj --mergeMat  "
-applyCommand COMMANDCompute
+COMMANDComputeMESH="decSiRP -m  ${INPUT_MESH}  -l ${LENGTH} -a ${THRESHOLDACC} -c ${THRESHOLDCONF} -d ${DISTANCEMAX} --lambda ${LAMBDA} --rho ${RHO} --export-segmentation resultSeg.obj --mergeMat  "
+
+COMMANDComputeVOL="decSiRP -i  ${INPUT_IMAGE}  -l ${LENGTH} -a ${THRESHOLDACC} -c ${THRESHOLDCONF} -d ${DISTANCEMAX} --lambda ${LAMBDA} --rho ${RHO} --export-segmentation resultSeg.obj --mergeMat  "
+
+
+if test -f "${INPUT_MESH}"
+then
+    applyCommand COMMANDComputeMESH
+fi
+
+if test -f "${INPUT_IMAGE}"
+then
+    applyCommand COMMANDComputeVOL
+fi
+
 
 
