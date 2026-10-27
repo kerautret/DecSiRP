@@ -12,7 +12,7 @@
          "Click on an image or upload one to use it as the algorithm input."
       ],
       "param_description": [
-         "You can choose the parameter and run the algorithm."
+         "You can choose the parameter and run the algorithm. "
       ],
       "xlink_article": "https://www.ipol.im/",
       "timeout": 1600
@@ -30,6 +30,10 @@
    ],
    "params": [
       {
+         "type": "label",
+         "label": "Parameters related to the voting (Step 1):"
+      },
+      {
          "id": "l",
          "label": "l: control the size of detectable structures (max size).",
          "type": "range",
@@ -42,21 +46,11 @@
             "step": 1
          }
       },
-
-     {
-         "id": "d",
-         "label": "d: control the size of detectable structures (min size).",
-         "type": "range",
-         "visible": true,
-         "comments": "it controls the minimal size of detectable feature (see l parameter for max size)",
-         "values": {
-            "default": 1,
-            "max": 100,
-            "min": 0,
-            "step": 0.01
-         }
+      {
+         "type": "label",
+         "label": "Parameters related to the cluster (Step 2):"
       },
-    {
+      {
          "id": "a",
          "label": "a: minimum accumulation value to consider candidate voxel.",
          "type": "range",
@@ -69,7 +63,7 @@
             "step": 1
          }
       },
-    {
+      {
          "id": "c",
          "label": "c: minimum confidence value to consider candidate voxel.",
          "type": "range",
@@ -82,37 +76,53 @@
             "step": 0.05
          }
       },
-     {
-         "id": "lambda",
-         "label": "λ: to govern the label extension process (from probabilty expansion value).",
+      {
+         "id": "d",
+         "label": "d: control the size of detectable structures (min size).",
          "type": "range",
          "visible": true,
-         "comments": "typically set to 10−3",
+         "comments": "it controls the minimal size of detectable feature (see l parameter for max size)",
          "values": {
-            "default": 0.001,
-            "max": 1,
+            "default": 1,
+            "max": 100,
             "min": 0,
-            "step": 0.05
+            "step": 0.01
          }
       },
-        {
-         "id": "rho",
-         "label": "ρ: to govern the label extension process (behaviour).",
+      {
+         "type": "label",
+         "label": "Parameters related to label extension (Step 3):"
+      },
+      {
+         "id": "lambda",
+         "label": "λ: Controls label extension.",
          "type": "range",
          "visible": true,
-         "comments": "1 means no extension, and the closer ρ is to 0, the greater the extension",
+         "comments": " values close to 1 limit extension, while values close to 0 allow maximal extension.",
          "values": {
             "default": 0.5,
             "max": 1,
             "min": 0,
             "step": 0.05
          }
+      },
+      {
+         "id": "rho",
+         "label": "ρ: probability threshold for the label extension process.",
+         "type": "range",
+         "visible": true,
+         "comments": "typically set to 10<sup>−3</sup>",
+         "values": {
+            "default": 0.001,
+            "max": 1,
+            "min": 0,
+            "step": 0.05
+         }
       }
-     
    ],
    "run": "bash $bin/.ipol/run.sh input_0.obj  ${l} ${a} ${c} ${d} ${lambda} ${rho} ",
    "results": [
-    {
+      {
          "contents": "resultSeg_mergeMat.obj",
          "type": "three_d",
          "label": "3D output file"
@@ -122,9 +132,9 @@
          "label": "<h3> You can download resulting file here:</h3>",
          "contents": {
             "Input mesh": "input_0.obj",
-             "Result segmentation (merge obj, mtl)": "resultSeg_mergeMat.obj",
-	     "Result segmentation (obj)": "resultSeg.obj",
-	     "Result segmentation (mtl)": "resultSeg.mtl"
+            "Result segmentation (merge obj, mtl)": "resultSeg_mergeMat.obj",
+            "Result segmentation (obj)": "resultSeg.obj",
+            "Result segmentation (mtl)": "resultSeg.mtl"
          }
       },
       {
@@ -134,3 +144,5 @@
       }
    ]
 }
+
+
