@@ -1,7 +1,9 @@
-FROM debian:trixie
+FROM docker.io/ker69/dgtaltools-contrib:latest
+
+
 
 # install additional debian packages
-RUN apt-get update && apt-get install -y build-essential cmake libgl-dev libboost-all-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev  m4 imagemagick git curl bash  clang  binutils wget imagemagick gnuplot xvfb 
+RUN apt-get update && apt-get install -y build-essential  imagemagick  curl bash    binutils wget imagemagick gnuplot xvfb 
 
 
 
@@ -11,7 +13,8 @@ ENV bin /workdir/bin/
 RUN mkdir -p $bin
 WORKDIR $bin
 COPY . .
-RUN git clone  -b DecSiRPdemo https://github.com/kerautret/DGtal.git; cd DGtal; mkdir build; cd build; cmake .. -DCPM_USE_LOCAL_PACKAGES=ON  -DDGTAL_WITH_POLYSCOPE_VIEWER=true -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF -DCMAKE_BUILD_TYPE:string="Release" ; make;
+
+
 RUN git clone https://github.com/kerautret/DecSiRP.git; cd DecSiRP;  mkdir build &&  cd build; cmake .. -DCMAKE_BUILD_TYPE:string="Release" -DDGtal_DIR="$bin/DGtal/build"  && make  && cp decSiRP $bin 
 
 
