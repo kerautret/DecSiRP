@@ -3,9 +3,7 @@ FROM docker.io/ker69/dgtaltools-contrib:latest
 
 
 # install additional debian packages
-RUN apt-get update && apt-get install -y build-essential  imagemagick  curl bash    binutils wget imagemagick gnuplot xvfb 
-
-
+RUN apt-get update && apt-get install -y build-essential  imagemagick  curl bash    binutils wget imagemagick gnuplot xvfb wmctrl
 
 
 # copy the code to $bin
@@ -15,7 +13,10 @@ WORKDIR $bin
 COPY . .
 
 
-RUN git clone https://github.com/kerautret/DecSiRP.git; cd DecSiRP;  mkdir build &&  cd build; cmake .. -DCMAKE_BUILD_TYPE:string="Release" -DDGtal_DIR="$bin/DGtal/build"  && make  && cp decSiRP $bin 
+
+
+
+RUN git clone -b DGtalDockerImage https://github.com/kerautret/DecSiRP.git; cd DecSiRP;  mkdir build &&  cd build; cmake .. -DCMAKE_BUILD_TYPE:string="Release" -DDGtal_DIR="$bin/DGtal/build"  && make  && cp decSiRP $bin && cp ../data/random.png  $bin/
 
 
 # the execution will happen in the folder /workdir/exec
@@ -29,5 +30,10 @@ ENV PATH $bin:$PATH
 # $HOME is writable by the user `ipol`, but 
 ENV HOME /home/ipol
 # chmod 777 so that any user can use the HOME, in case the docker is run with -u 1001:1001
-RUN groupadd -g 1000 ipol && useradd -m -u 1000 -g 1000 ipol -d $HOME && chmod -R 777 $HOME
+
+RUN if ! id ipol >/dev/null 2>&1; then \
+      useradd -m -u 1001 -g 1000 -d "$HOME" ipol; \
+    fi && \
+    chmod -R 777 "$HOME"
+
 USER ipol
