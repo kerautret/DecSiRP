@@ -14,8 +14,6 @@ COPY . .
 
 
 
-
-
 RUN git clone -b DGtalDockerImage https://github.com/kerautret/DecSiRP.git; cd DecSiRP;  mkdir build &&  cd build; cmake .. -DCMAKE_BUILD_TYPE:string="Release" -DDGtal_DIR="$bin/DGtal/build"  && make  && cp decSiRP $bin &&  cp ../data/random.png  $bin/
 
 
