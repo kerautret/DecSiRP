@@ -1,4 +1,4 @@
-FROM docker.io/ker69/dgtaltools-contrib:latest
+ FROM docker.io/ker69/dgtaltools-contrib@sha256:e889e545b3483570167da40d437ead18c9cf0808b4e262c10dca3ec297ed0b31
 
 
 
@@ -34,3 +34,4 @@ RUN if ! id ipol >/dev/null 2>&1; then \
     chmod -R 777 "$HOME"
 
 USER ipol
+
