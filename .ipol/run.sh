@@ -58,7 +58,7 @@ fi
 if test -f "${INPUT_IMAGE}"
 then
     applyCommand COMMANDComputeVOL
-    3dVolViewer ${INPUT_IMAGE} -m 1  2>&1 |  while read -r line; do if [[ $line == "[display ready]" ]] ; then sleep 1s; import -window root -display :1 -screen visuInput.png; pkill 3dVolViewer;  fi; done;
+    3dImageViewer ${INPUT_IMAGE} - 2>&1 |  while read -r line; do if [[ "$line" == "Image loaded:"* ]]; then sleep 2s; import -window root -display :1 -screen visuInput.png; pkill 3dImageViewer;  fi; done;
     meshViewer resultSeg.obj   2>&1 |  while read -r line; do if [[ $line == "[display ready]" ]] ; then sleep 1s; import -window root -display :1 -screen visuResult.png; pkill meshViewer;  fi; done;
     decSiRP -i "${INPUT_IMAGE}" -l "${LENGTH}" -a "${THRESHOLDACC}" -c "${THRESHOLDCONF}" -d "${DISTANCEMAX}" --lambda "${LAMBDA}" --rho "${RHO}" 2>&1 | while read -r line; do if [[ "$line" == "[display ready]" ]]; then sleep 1s; echo "import image.."; import -window root -display :1 -screen visuInterface.png; pkill decSiRP; fi; done;
     echo "[done]"
