@@ -56,6 +56,7 @@ then
 fi
 
 
+
 if test -f "${INPUT_IMAGE}"
 then
     applyCommand COMMANDComputeVOL
