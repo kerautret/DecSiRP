@@ -17,12 +17,16 @@ function applyCommand
   for c in $*
   do
       echo "Starting command: ${!c}  "
-      utime="$( TIMEFORMAT='%lU';time ( ${!c} 2> /dev/null  ) 2>&1 1>/dev/null )"
+      utime="$( TIMEFORMAT='%lU';time ( ${!c} 2> logCmd.txt  ) 2>&1 1>/dev/null )"
       if [ $? -ne 0 ] 
       then
           exit 1
       else
           echo "[done] (in $utime)"
+          echo "----------------------------------------"
+          echo "log:"
+          cat logCmd.txt | sed -E 's/\x1B\[[0-9;]*[[:alpha:]]//g'
+          echo "----------------------------------------"
       fi
   done
 }
@@ -40,16 +44,17 @@ then
     echo "inputType=1" >> algo_info.txt
     COMMANDUpdate="meshBasicEdit  ${INPUT_MESH}  --rescaleInterToCube 50 256 -o ${INPUT_MESH}"
     applyCommand COMMANDUpdate
-    applyCommand COMMANDComputeMESH
-    echo "Generate display from input:"
-    meshViewer ${INPUT_MESH}   2>&1 |  while read -r line; do if [[ $line == "[display ready]" ]] ; then sleep 1s; import -window root -display :1 -screen visuInput.png; pkill meshViewer;  fi; done;
-    meshViewer resultSeg.obj   2>&1 |  while read -r line; do if [[ $line == "[display ready]" ]] ; then sleep 1s; import -window root -display :1 -screen visuResult.png; pkill meshViewer;  fi; done;
     echo "----------------------------------------"
     echo "-----Computing segmentation from Mesh---"
     echo "----------------------------------------"
-
-    decSiRP -m "${INPUT_MESH}" -l "${LENGTH}" -a "${THRESHOLDACC}" -c "${THRESHOLDCONF}" -d "${DISTANCEMAX}" --lambda "${LAMBDA}" --rho "${RHO}" 2>&1 | while read -r line; do echo $line;  if [[ "$line" == "[display ready]" ]]; then sleep 1s; echo "import image.."; import -window root -display :1 -screen visuInterface.png; pkill decSiRP; fi; done;
-    echo "[done]"
+    applyCommand COMMANDComputeMESH
+    echo "----------------------------------------"
+    echo "Generting image preview... "
+    meshViewer ${INPUT_MESH}   2>&1 |  while read -r line; do if [[ $line == "[display ready]" ]] ; then sleep 1s; import -window root -display :1 -screen visuInput.png; pkill meshViewer;  fi; done;
+    meshViewer resultSeg.obj   2>&1 |  while read -r line; do if [[ $line == "[display ready]" ]] ; then sleep 1s; import -window root -display :1 -screen visuResult.png; pkill meshViewer;  fi; done;
+ 
+    decSiRP -m "${INPUT_MESH}" -l "${LENGTH}" -a "${THRESHOLDACC}" -c "${THRESHOLDCONF}" -d "${DISTANCEMAX}" --lambda "${LAMBDA}" --rho "${RHO}" 2>&1 | while read -r line; do   if [[ "$line" == "[display ready]" ]]; then sleep 1s;  import -window root -display :1 -screen visuInterface.png; pkill decSiRP; fi; done;
+    echo -n  "[done]" 
     convert visuInput.png -fuzz 3% -trim +repage -resize 800x600 visuInput.png 2>&1
     convert visuResult.png -fuzz 3% -trim +repage -resize 800x600 visuResult.png 2>&1
     convert visuInterface.png -fuzz 3% -trim +repage -resize 800x600 visuInterface.png 2>&1
@@ -58,15 +63,17 @@ then
 elif test -f "${INPUT_IMAGE}"
 then
     echo "inputType=2" >> algo_info.txt
-    applyCommand COMMANDComputeVOL
-    3dImageViewer ${INPUT_IMAGE} - 2>&1 |  while read -r line; do if [[ "$line" == "Image loaded:"* ]]; then sleep 2s; import -window root -display :1 -screen visuInput.png; pkill 3dImageViewer;  fi; done;
-    meshViewer resultSeg.obj   2>&1 |  while read -r line; do if [[ $line == "[display ready]" ]] ; then sleep 1s; import -window root -display :1 -screen visuResult.png; pkill meshViewer;  fi; done;
     echo "----------------------------------------"
     echo "-----Computing segmentation from vol---"
     echo "----------------------------------------"
-
-    decSiRP -i "${INPUT_IMAGE}" -l "${LENGTH}" -a "${THRESHOLDACC}" -c "${THRESHOLDCONF}" -d "${DISTANCEMAX}" --lambda "${LAMBDA}" --rho "${RHO}" 2>&1 | while read -r line; do if [[ "$line" == "[display ready]" ]]; then sleep 1s; echo "import image.."; import -window root -display :1 -screen visuInterface.png; pkill decSiRP; fi; done;
-    echo "[done]"
+    applyCommand COMMANDComputeVOL
+    echo "----------------------------------------"
+    echo "Generting image preview..."
+    3dImageViewer ${INPUT_IMAGE} - 2>&1 |  while read -r line; do if [[ "$line" == "Image loaded:"* ]]; then sleep 2s; import -window root -display :1 -screen visuInput.png; pkill 3dImageViewer;  fi; done;
+    meshViewer resultSeg.obj   2>&1 |  while read -r line; do if [[ $line == "[display ready]" ]] ; then sleep 1s; import -window root -display :1 -screen visuResult.png; pkill meshViewer;  fi; done;
+  
+    decSiRP -i "${INPUT_IMAGE}" -l "${LENGTH}" -a "${THRESHOLDACC}" -c "${THRESHOLDCONF}" -d "${DISTANCEMAX}" --lambda "${LAMBDA}" --rho "${RHO}" 2>&1 | while read -r line; do if [[ "$line" == "[display ready]" ]]; then sleep 1s;  import -window root -display :1 -screen visuInterface.png; pkill decSiRP; fi; done;
+    echo -n "[done]"
     convert visuInput.png -fuzz 3% -trim +repage -resize 800x600 visuInput.png 2>&1
     convert visuResult.png -fuzz 3% -trim +repage -resize 800x600 visuResult.png 2>&1
     convert visuInterface.png -fuzz 3% -trim +repage -resize 800x600 visuInterface.png 2>&1
